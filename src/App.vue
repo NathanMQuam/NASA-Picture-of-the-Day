@@ -13,7 +13,7 @@
         <div class="col">
           <!-- NOTE We bind to the state with v-model from our input -->
           <form @submit.prevent="search">
-            <input class="mx-1" type="text" placeholder="Photo Title..." v-model="state.query">
+            <input class="mx-1" type="date" :max="state.date" v-model="state.query" required>
             <button type="submit" class="btn btn-outline-success">Search</button>
           </form>
         </div>
@@ -39,15 +39,17 @@
 
 <script>
 import { computed, reactive } from 'vue'
-import AppState from './AppState'
-// import PhotoDetails from './components/PhotoDetails'
+import { AppState } from './AppState'
+import PhotoDetails from './components/PhotoDetails'
 import { photoService } from './services/PhotoService.js'
 
 export default {
   name: 'App',
   setup () {
+    const date = new Date()
     const state = reactive({
       query: '',
+      date: `${date.getFullYear}-${date.getMonth}-${date.getDate}`,
       photos: computed(() => AppState.photos)
     })
     return {
@@ -55,7 +57,7 @@ export default {
       async search () {
         try {
           // NOTE call to service and await the results
-          await photoService.searchPhotos(state.query)
+          await photoService.searchPhotos(`${state.query}`)
           // NOTE due to two way data binding we reset the form by resetting the value of query
           state.query = ''
         } catch (error) {
@@ -64,7 +66,9 @@ export default {
       }
     }
   },
-  components: {}
+  components: {
+    PhotoDetails
+  }
 }
 </script>
 
